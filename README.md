@@ -11,11 +11,6 @@ Smart Search Logic: I found that exact title matching leads to a poor user exper
 
 High Efficiency: By utilizing Cosine Similarity on a pre-calculated matrix, the system retrieves the top 5 matches from a library of 25,000+ titles in under 0.5 seconds.
 
-# 📊 Visual Insights
-The Machine Learning Pipeline:
-
-Live UI & Results:
-
 # 🛠️ Tools Used
 Python (Pandas, NumPy)
 
