@@ -2,61 +2,65 @@ import streamlit as st
 import pickle
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
-import difflib
+import numpy as np
 
-# --- PAGE SETUP ---
-st.set_page_config(page_title="Movie Matcher AI", page_icon="🎬")
+# --- 1. SETUP ---
+st.set_page_config(page_title="Movie Matcher", page_icon="🎬")
 
-# --- LOAD DATA ---
-@st.cache_data # This makes the app super fast by keeping data in memory
+# --- 2. LOAD DATA ---
+@st.cache_data
 def load_data():
-    movies = pd.DataFrame(pickle.load(open('movie_list.pkl', 'rb')))
+    df = pd.DataFrame(pickle.load(open('movie_list.pkl', 'rb')))
     tfidf_matrix = pickle.load(open('tfidf_matrix.pkl', 'rb'))
-    return movies, tfidf_matrix
+    return df, tfidf_matrix
 
-movies, tfidf_matrix = load_data()
+df, tfidf_matrix = load_data()
 
-# --- UI ELEMENTS ---
+# --- 3. UI ---
 st.title("🎬 AI Movie Recommender")
-st.markdown("Enter a movie you like, and I'll find similar ones based on story and genre.")
 
-# Search box
-user_input = st.text_input("Search for a movie (e.g., The Godfather, Iron Man):", "")
+movie_input = st.text_input("Type a movie name (e.g., 'batman'):")
 
-if st.button('Get Recommendations'):
-    if user_input:
-        # 1. Precise Fuzzy Matching
-        all_titles = movies['title'].tolist()
-        # cutoff=0.6 means it won't guess wildly; it needs to be 60% similar
-        close_matches = difflib.get_close_matches(user_input, all_titles, n=1, cutoff=0.5)
-        
-        if close_matches:
-            selected_movie = close_matches[0]
-            st.success(f"Showing results for: **{selected_movie}**")
+if st.button('Recommend'):
+    if movie_input:
+        # --- YOUR EXACT FUNCTION LOGIC ---
+        try:
+            # 1. Fuzzy Search: Look for movies that contain the user's text
+            matches = df[df['title'].str.contains(movie_input, case=False, na=False)]
             
-            # 2. Recommendation Logic
-            idx = movies[movies['title'] == selected_movie].index[0]
-            similarity_scores = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
-            
-            # Get top 6 (excluding the movie itself)
-            similar_indices = similarity_scores.argsort()[-7:-1][::-1]
-            
-            # 3. Display Results
-            st.divider()
-            for i in similar_indices:
-                movie_data = movies.iloc[i]
-                col1, col2 = st.columns([3, 1])
+            if matches.empty:
+                st.warning("⚠️ Movie not found. Please try a different name!")
+            else:
+                # 2. Pick the most popular (Safety check: uses index 0 if popularity isn't in file)
+                if 'popularity' in matches.columns:
+                    idx = matches.sort_values(by='popularity', ascending=False).index[0]
+                else:
+                    idx = matches.index[0]
                 
-                with col1:
-                    st.subheader(f"{movie_data['title']}")
-                    st.caption(f"Genre: {movie_data['genres']}")
+                # 3. Calculate similarity for just this one movie
+                target_vector = tfidf_matrix[idx]
+                scores = cosine_similarity(target_vector, tfidf_matrix).flatten()
                 
-                with col2:
-                    # Professional formatting for ratings
-                    st.metric("Rating", f"⭐ {movie_data['vote_average']}")
+                # 4. Get the Top 5 most similar (excluding itself)
+                top_indices = np.argsort(scores)[-6:-1][::-1]
+                recommendations = df.iloc[top_indices]
+
+                # --- DISPLAY ---
+                st.success(f"Results for: **{df.iloc[idx]['title']}**")
                 st.divider()
-        else:
-            st.warning("No close match found. Please check your spelling and try again!")
+
+                for _, row in recommendations.iterrows():
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.subheader(row['title'])
+                        st.write(f"**Genres:** {row['genres']}")
+                    with col2:
+                        # Professional star rating display
+                        st.metric("Rating", f"⭐ {row['vote_average']}")
+                    st.divider()
+
+        except Exception as e:
+            st.error("An error occurred. Please try a more specific title.")
     else:
-        st.error("Please type a movie name first.")
+        st.info("Please enter a movie title to see recommendations.")
 
