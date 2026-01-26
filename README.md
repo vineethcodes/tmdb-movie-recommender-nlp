@@ -2,7 +2,7 @@
 📝 Project Overview
 I developed an end-to-end recommendation engine that analyzes a dataset of 25,000+ movies to suggest films based on story themes, genres, and "vibes." This project bridges the gap between raw data analysis in Kaggle and a live, user-facing product, allowing users to discover films using Natural Language Processing (NLP).
 
-🔗 View Live App Here
+🔗 [View Live App Here](https://vineeth-movie-recommender.streamlit.app/)
 
 # 🚀 Key Findings
 NLP Vectorization: By combining movie overviews and genres into a single "Tags" column, I used TF-IDF to turn text into mathematical vectors. This allows the system to recognize that Interstellar and The Martian are similar beyond just being in the "Sci-Fi" category.
