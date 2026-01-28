@@ -20,7 +20,7 @@ df, tfidf_matrix = load_data()
 # --- 3. UI HEADER ---
 st.title("🎬 MovieMatch AI")
 st.markdown("### Intelligent Recommendation System")
-st.write("Enter a movie you like, and I'll find similar ones based on genres and descriptions.")
+#st.write("Enter a movie you like, and I'll find similar ones based on genres and descriptions.")
 
 # --- 4. SEARCH INPUT ---
 movie_input = st.text_input("Type a movie name (e.g., 'batman'):")
@@ -61,11 +61,11 @@ if st.button('Get Recommendations'):
                         rating = row['vote_average']
                         
                         if rating == 0:
-                            display_rating = "Rating Not Available"
+                            display_rating = "Rating NA"
                         else:
                             display_rating = f"⭐ {rating:.1f}/10"
                         
-                        st.metric("Score", display_rating)
+                        st.metric("Rating", display_rating)
                     
                     st.divider()
 
@@ -73,4 +73,5 @@ if st.button('Get Recommendations'):
             st.error("Error processing request. Please try a more specific title.")
     else:
         st.info("Please enter a movie title first.")
+
 
