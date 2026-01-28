@@ -20,3 +20,5 @@ Deployment (Streamlit Cloud, GitHub, VS Code)
 
 # 💡 My Process & AI Oversight
 In this project, I used AI to help optimize the math behind the Cosine Similarity matrix. However, I applied a "Human Filter" to the deployment phase—when local firewall restrictions prevented the app from running on my machine, I pivoted to a GitHub-to-Cloud workflow. This ensured the final product was a live, accessible URL rather than just static code on a hard drive.
+# Feature Update
+Smart Data Handling: Custom logic to identify and label unreleased or unrated titles ("Rating NA") to ensure data integrity and a clean user experience.
